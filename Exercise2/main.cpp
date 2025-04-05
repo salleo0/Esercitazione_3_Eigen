@@ -1,7 +1,27 @@
 #include <iostream>
 #include <Eigen/Eigen>
+#include <iomanip>
 using namespace std;
 using namespace Eigen;
+
+bool MatrixIsSingular(const MatrixXd& A)
+{
+    JacobiSVD<MatrixXd> svd(A);
+    VectorXd singularValuesA = svd.singularValues();
+
+    if( singularValuesA.minCoeff() < 1e-16)
+        return false;
+    else
+        return true;
+}
+
+VectorXd solveLinearSystem(const MatrixXd& A, const VectorXd& b) 
+{
+	if (!MatrixIsSingular(A)) 
+		return A.partialPivLu().solve(b);
+	else
+		return A.colPivHouseholderQr().solve(b);
+}
 
 int main()
 {
@@ -26,5 +46,27 @@ int main()
 	
 	VectorXd b3(n);
 	b3 << -6.400391328043042e-10, 4.266924591433963e-10;
+	
+	VectorXd exact_sol(n);
+	exact_sol << -1.0e+0, -1.0e+00;
+	
+	VectorXd sol1 = solveLinearSystem(A1, b1);
+	cout << "---First system---" << endl;
+	cout << "Solution: " << endl;
+	cout << scientific << setprecision(16) << sol1 << endl;
+	cout << scientific << setprecision(16) << "Relative error: " << (exact_sol - sol1).norm() / exact_sol.norm() << endl;
+	
+	VectorXd sol2 = solveLinearSystem(A2, b2);
+	cout << "---Second system---" << endl;
+	cout << "Solution: " << endl;
+	cout << scientific << setprecision(16) << sol2 << endl;
+	cout << scientific << setprecision(16) << "Relative error: " << (exact_sol - sol2).norm() / exact_sol.norm() << endl;
+	
+	VectorXd sol3 = solveLinearSystem(A3, b3);
+	cout << "---Third system---" << endl;
+	cout << "Solution: " << endl;
+	cout << scientific << setprecision(16) << sol3 << endl;
+	cout << scientific << setprecision(16) << "Relative error: " << (exact_sol - sol3).norm() / exact_sol.norm() << endl;
+	
     return 0;
 }
