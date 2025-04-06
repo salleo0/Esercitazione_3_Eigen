@@ -4,25 +4,6 @@
 using namespace std;
 using namespace Eigen;
 
-bool MatrixIsSingular(const MatrixXd& A)
-{
-    JacobiSVD<MatrixXd> svd(A);
-    VectorXd singularValuesA = svd.singularValues();
-
-    if( singularValuesA.minCoeff() < 1e-16)
-        return false;
-    else
-        return true;
-}
-
-VectorXd solveLinearSystem(const MatrixXd& A, const VectorXd& b) 
-{
-	if (!MatrixIsSingular(A)) 
-		return A.partialPivLu().solve(b);
-	else
-		return A.colPivHouseholderQr().solve(b);
-}
-
 int main()
 {
 	const unsigned int n = 2;
@@ -50,23 +31,35 @@ int main()
 	VectorXd exact_sol(n);
 	exact_sol << -1.0e+0, -1.0e+00;
 	
-	VectorXd sol1 = solveLinearSystem(A1, b1);
+	VectorXd sol1_LU = A1.partialPivLu().solve(b1);
+	VectorXd sol1_QR = A1.colPivHouseholderQr().solve(b1);
 	cout << "---First system---" << endl;
-	cout << "Solution: " << endl;
-	cout << scientific << setprecision(16) << sol1 << endl;
-	cout << scientific << setprecision(16) << "Relative error: " << (exact_sol - sol1).norm() / exact_sol.norm() << endl;
+	cout << "Solution through PA=LU fafctorization: " << endl;
+	cout << scientific << setprecision(16) << sol1_LU << endl;
+	cout << scientific << setprecision(16) << "Relative error: " << (exact_sol - sol1_LU).norm() / exact_sol.norm() << endl;
+	cout << "Solution through QR fafctorization: " << endl;
+	cout << scientific << setprecision(16) << sol1_QR << endl;
+	cout << scientific << setprecision(16) << "Relative error: " << (exact_sol - sol1_QR).norm() / exact_sol.norm() << endl;
 	
-	VectorXd sol2 = solveLinearSystem(A2, b2);
-	cout << "---Second system---" << endl;
-	cout << "Solution: " << endl;
-	cout << scientific << setprecision(16) << sol2 << endl;
-	cout << scientific << setprecision(16) << "Relative error: " << (exact_sol - sol2).norm() / exact_sol.norm() << endl;
+	VectorXd sol2_LU = A2.partialPivLu().solve(b2);
+	VectorXd sol2_QR = A2.colPivHouseholderQr().solve(b2);
+	cout << endl << "---Second system---" << endl;
+	cout << "Solution through PA=LU fafctorization: " << endl;
+	cout << scientific << setprecision(16) << sol2_LU << endl;
+	cout << scientific << setprecision(16) << "Relative error: " << (exact_sol - sol2_LU).norm() / exact_sol.norm() << endl;
+	cout << "Solution through QR fafctorization: " << endl;
+	cout << scientific << setprecision(16) << sol2_QR << endl;
+	cout << scientific << setprecision(16) << "Relative error: " << (exact_sol - sol2_QR).norm() / exact_sol.norm() << endl;
 	
-	VectorXd sol3 = solveLinearSystem(A3, b3);
-	cout << "---Third system---" << endl;
-	cout << "Solution: " << endl;
-	cout << scientific << setprecision(16) << sol3 << endl;
-	cout << scientific << setprecision(16) << "Relative error: " << (exact_sol - sol3).norm() / exact_sol.norm() << endl;
+	VectorXd sol3_LU = A3.partialPivLu().solve(b3);
+	VectorXd sol3_QR = A3.colPivHouseholderQr().solve(b3);
+	cout << endl << "---Third system---" << endl;
+	cout << "Solution through PA=LU fafctorization: " << endl;
+	cout << scientific << setprecision(16) << sol3_LU << endl;
+	cout << scientific << setprecision(16) << "Relative error: " << (exact_sol - sol3_LU).norm() / exact_sol.norm() << endl;
+	cout << "Solution through QR fafctorization: " << endl;
+	cout << scientific << setprecision(16) << sol3_QR << endl;
+	cout << scientific << setprecision(16) << "Relative error: " << (exact_sol - sol3_QR).norm() / exact_sol.norm() << endl;
 	
     return 0;
 }
